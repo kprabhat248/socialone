@@ -11,8 +11,8 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
-	httpSwagger "github.com/swaggo/http-swagger/v2" // http-swagger middleware
-	"/docs"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
+	// http-swagger middleware
 )
 
 
@@ -80,7 +80,7 @@ func (app *application) mount() http.Handler {
 }
 func (app *application) run(Mux http.Handler) error {
 	//Docs
-	docs.SwaggerInfo.Version = version
+	//docs.SwaggerInfo.Version = version
 	srv:=&http.Server{
 		Addr: app.config.addr,
 		Handler: Mux,
