@@ -24,7 +24,10 @@ type Storage struct {
 	}
 	Users interface{
 		GetByID (context.Context, int64) (*User, error)
-		Create (context.Context, *User) error
+		Create (context.Context, *sql.Tx, *User) error
+		CreateAndInvite(ctx context.Context,user *User, token string, exp  time.Duration) error
+		Activate(context.Context, string) error
+		Delete(context.Context, int64) error
 
 	}
 
@@ -47,4 +50,44 @@ func NewPostgress(db *sql.DB) *Storage {
 		Comments: &CommentsStore{db: db},
 		Followers: &FollowerStore{db: db},
 	}
+}
+
+
+func withTx(db *sql.DB, ctx context.Context,fn func(*sql.Tx) error) error{
+	tx,err:= db.BeginTx(ctx,nil)
+	if err!=nil{
+		return err
+	}
+	if err:= fn(tx); err!=nil{
+		_= tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
+
+}
+
+
+func (s *UserStore) Delete(ctx context.Context, userID int64) error{
+	return withTx(s.db,ctx,func(tx *sql.Tx) error{
+		if err:= s.delete(ctx,tx,userID);err!=nil{
+			return err
+		}
+		if err:= s.deleteUserInvitations(ctx,tx,userID);err!=nil{
+		return err
+
+	}
+	return nil
+	})
+}
+func (s *UserStore) delete(ctx context.Context, tx *sql.Tx, userID int64) error{
+	query:= `DELETE FROM users WHERE id=$1`
+	ctx,cancel:= context.WithTimeout(ctx,QueryTimeoutDuration)
+	defer cancel()
+
+	_,err:= tx.ExecContext(ctx, query, userID)
+	if err!=nil{
+		return err
+	}
+	return nil
 }

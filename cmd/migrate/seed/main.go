@@ -17,5 +17,5 @@ func main(){
 	store:= store.NewPostgress(conn)
 
 
-	db.Seed(*store)
+	db.Seed(*store,conn)
 }

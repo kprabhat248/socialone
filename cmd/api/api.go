@@ -5,14 +5,16 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"socialone/docs"
+	"socialone/internal/mailer"
 	"socialone/internal/store"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"go.uber.org/zap"
 
-	httpSwagger "github.com/swaggo/http-swagger/v2"
-	// http-swagger middleware
+	httpSwagger "github.com/swaggo/http-swagger/v2" // http-swagger middleware
 )
 
 
@@ -20,6 +22,8 @@ import (
 type application struct{
 	config config
 	store store.Storage
+	logger *zap.SugaredLogger
+	mailer	 mailer.Client
 
 
 
@@ -28,8 +32,23 @@ type config struct {
 	addr string
 	db dbConfig
 	env string
+	apiUrl string
+	mail mailConfig
+	frontendURL string 
+
 
 }
+type mailConfig struct{
+	sendGrid  sendGridConfig
+	exp time.Duration
+	fromEmail string
+
+}
+type sendGridConfig struct{
+	apiKey string
+
+}
+
 type dbConfig struct{
 	addr string
 	maxOpenConns int
@@ -61,6 +80,7 @@ func (app *application) mount() http.Handler {
 		})
 
 		r.Route("/users", func(r chi.Router) {
+			r.Put("/activate/{token}",app.activateUserHandler)
 			r.Route("/{userID}", func(r chi.Router) {
 				r.Use(app.userContextMiddleware)
 				r.Get("/", app.getUserHandler)
@@ -73,6 +93,11 @@ func (app *application) mount() http.Handler {
 			r.Group(func(r chi.Router) {
 				r.Get("/feed",app.getUserFeedHandler)
 			})
+
+	})
+			r.Route("/authentication",func(r chi.Router) {
+			r.Post("/user",app.registerUserHandler)
+
 		})
 	})
 
@@ -80,7 +105,9 @@ func (app *application) mount() http.Handler {
 }
 func (app *application) run(Mux http.Handler) error {
 	//Docs
-	//docs.SwaggerInfo.Version = version
+	docs.SwaggerInfo.Version = version
+	docs.SwaggerInfo.Host= app.config.apiUrl
+	docs.SwaggerInfo.BasePath= "/v1"
 	srv:=&http.Server{
 		Addr: app.config.addr,
 		Handler: Mux,
@@ -89,6 +116,6 @@ func (app *application) run(Mux http.Handler) error {
 		IdleTimeout: time.Minute,
 		ErrorLog: log.New(os.Stderr, "", log.LstdFlags),
 	}
-	log.Printf("Starting server on %s", app.config.addr)
+	app.logger.Infow("Starting server on %s", app.config.addr)
 	return srv.ListenAndServe()
 }
