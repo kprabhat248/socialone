@@ -34,20 +34,21 @@ type config struct {
 	env string
 	apiUrl string
 	mail mailConfig
-	frontendURL string 
+	frontendURL string
 
 
 }
 type mailConfig struct{
-	sendGrid  sendGridConfig
+	smtp2go smtp2goConfig
 	exp time.Duration
 	fromEmail string
 
 }
-type sendGridConfig struct{
-	apiKey string
+type smtp2goConfig struct {
+	apiKey   string
 
 }
+
 
 type dbConfig struct{
 	addr string

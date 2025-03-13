@@ -5,73 +5,62 @@ import (
 	"fmt"
 	"log"
 	"text/template"
-	"time"
 
-	"github.com/sendgrid/sendgrid-go"
-	"github.com/sendgrid/sendgrid-go/helpers/mail"
+	"github.com/smtp2go-oss/smtp2go-go"
 )
 
-type SendGridMailer struct{
+// SMTP2GoMailer represents a mailer using the SMTP2Go API.
+type SMTP2GoMailer struct {
 	fromEmail string
-	apiKey	string
-	client	*sendgrid.Client
-
+	apiKey    string
 }
 
-func NewSendGrid(apiKey,fromEmail string) *SendGridMailer{
-	client:= sendgrid.NewSendClient(apiKey)
-
-	return &SendGridMailer{
+// NewSMTP2GoMailer creates a new SMTP2GoMailer instance.
+func NewSMTP2GoMailer(apiKey, fromEmail string) *SMTP2GoMailer {
+	return &SMTP2GoMailer{
 		fromEmail: fromEmail,
-		apiKey: apiKey,
-		client: client,
+		apiKey:    apiKey,
 	}
 }
 
-func (m *SendGridMailer) Send(templateFile, username, email string, data any, isSandbox bool) error{
-	from:= mail.NewEmail(FromName, m.fromEmail)
-	to:= mail.NewEmail(username,email)
-
-	tmpl,err:= template.ParseFS(FS,"templates/"+templateFile)
-	if err!=nil{
-		return err
+// Send sends an email using the SMTP2Go API with templated content.
+func (m *SMTP2GoMailer) Send(templateFile, username, email string, data any, isSandbox bool) error {
+	// Read the template file
+	tmpl, err := template.ParseFS(FS, "templates/"+templateFile)
+	if err != nil {
+		return fmt.Errorf("failed to parse template: %w", err)
 	}
 
-	subject:= new(bytes.Buffer)
-	err= tmpl.ExecuteTemplate(subject, "subject", data)
-	if err!=nil{
-		return err
-	}
-	body:= new(bytes.Buffer)
-	err= tmpl.ExecuteTemplate(body, "body ", data)
-	if err!=nil{
-		return err
+	// Prepare subject and body from the template
+	subject := new(bytes.Buffer)
+	err = tmpl.ExecuteTemplate(subject, "subject", data)
+	if err != nil {
+		return fmt.Errorf("failed to execute subject template: %w", err)
 	}
 
-	message:= mail.NewSingleEmail(from,subject.String(),to,"", body.String())
-
-	message.SetMailSettings(&mail.MailSettings{
-		SandboxMode: &mail.Setting{
-			Enable: &isSandbox,
-		},
-	})
-
-
-	for i:=0;i<maxRetries;i++{
-		response,err:= m.client.Send(message)
-		if err!=nil{
-			log.Printf("Failed to send the Email to %v, attempt %d of %d", email, i+1, maxRetries)
-			log.Printf( "Error :%v", err.Error())
-
-			time.Sleep(time.Second *time.Duration(i+1))
-			continue
-		}
-		log.Printf("Email sent successfully", email, response.StatusCode)
-		return nil
-
+	body := new(bytes.Buffer)
+	err = tmpl.ExecuteTemplate(body, "body", data)
+	if err != nil {
+		return fmt.Errorf("failed to execute body template: %w", err)
 	}
-	return fmt.Errorf("failed to send email after %d attempts",maxRetries)
 
+	// Create an instance of the SMTP2Go email struct
+	emailData := smtp2go.Email{
+		From:     m.fromEmail,
+		To:       []string{email},
+		Subject:  subject.String(),
+		TextBody: body.String(),
+		HtmlBody: body.String(), // You can use a different body for HTML if needed
+	}
 
+	// Send the email using the SMTP2Go API key (API Key should be set in environment variables)
+	res, err := smtp2go.Send(&emailData)
+	if err != nil {
+		log.Printf("An error occurred: %s", err)
+		return fmt.Errorf("failed to send email: %w", err)
+	}
 
+	log.Printf("Email sent successfully to %v", email)
+	log.Printf("Response: %v", res)
+	return nil
 }

@@ -82,7 +82,7 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		User: user,
 		Token: plainToken ,
 	}
-	activationURL:= fmt.Sprint("%s/confirm/%s",app.config.frontendURL,plainToken)
+	activationURL:= fmt.Sprintf("%s/confirm/%s",app.config.frontendURL,plainToken)
 	isProdEnv:= app.config.env=="production"
 	vars:= struct{
 		Username string
