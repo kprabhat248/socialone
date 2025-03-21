@@ -1,12 +1,14 @@
 package main
 
 import (
+	"log"
+	"socialone/internal/auth"
 	"socialone/internal/db"
 	"socialone/internal/env"
 	"socialone/internal/mailer"
 	"socialone/internal/store"
 	"time"
-	"log"
+
 	"github.com/joho/godotenv" // Import the godotenv package
 	"go.uber.org/zap"
 )
@@ -47,7 +49,7 @@ func main() {
 	cfg := config{
 		addr: env.Getstring("ADDR", ":8080"),
 		apiUrl: env.Getstring("EXTERNAL_URL", "localhost:8080"),
-		frontendURL: env.Getstring("FRONTEND_URL", "localhost:4000"),
+		frontendURL: env.Getstring("FRONTEND_URL", "localhost:5173"),
 		db: dbConfig{
 			addr: env.Getstring("DB_ADDR", "host=localhost port=5433 user=admin password=adminpassword dbname=postgres sslmode=disable"),
 			maxOpenConns: env.Getint("DB_MAX_OPEN_CONNS", 25),
@@ -60,6 +62,17 @@ func main() {
 			fromEmail: env.Getstring("MAIL_FROM_EMAIL", ""),
 			smtp2go: smtp2goConfig{
 				apiKey: env.Getstring("SMTP2GO_API_KEY", ""),
+			},
+		},
+		auth: authConfig{
+			basic: basicConfig{
+				user: env.Getstring("BASIC_AUTH_USER", "admin"),
+				pass: env.Getstring("BASIC_AUTH_PASS", "password"),
+			},
+			token: tokenConfig{
+				secret: env.Getstring("AUTH_TOKEN_SECRET", "secret"),
+				exp: time.Hour*24*3,
+				iss: env.Getstring("AUTH_TOKEN_ISS)", "socialone"),
 			},
 		},
 	}
@@ -81,12 +94,15 @@ func main() {
 	store := store.NewPostgress(db)
 	mailer := mailer.NewSMTP2GoMailer(cfg.mail.smtp2go.apiKey, cfg.mail.fromEmail)
 
+	jwtAuthenticator:= auth.NewJWTAuthenticator(cfg.auth.token.secret,cfg.auth.token.iss ,cfg.auth.token.iss)
+
 	// Initialize the application with config, store, logger, and mailer
 	app := &application{
 		config: cfg,
 		store:  *store,
 		logger: logger,
 		mailer: mailer,
+		authenticator: jwtAuthenticator,
 	}
 
 	// Set up the HTTP mux and run the application

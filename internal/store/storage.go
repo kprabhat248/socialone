@@ -23,8 +23,9 @@ type Storage struct {
 		GetUserFeed (context.Context, int64, PaginatedFeedQuery) ([]*PostwithMetaData, error)
 	}
 	Users interface{
-		GetByID (context.Context, int64) (*User, error)
-		Create (context.Context, *sql.Tx, *User) error
+		GetByID(context.Context, int64) (*User, error)
+		GetByEmail(context.Context, string) (*User, error)
+		Create(context.Context, *sql.Tx, *User) error
 		CreateAndInvite(ctx context.Context,user *User, token string, exp  time.Duration) error
 		Activate(context.Context, string) error
 		Delete(context.Context, int64) error
@@ -33,7 +34,7 @@ type Storage struct {
 
 	Comments interface{
 		Create(context.Context, *Comments) error
-		GetByPostID (context.Context, int64) (*[]Comments, error)
+		GetByPostID(context.Context, int64) (*[]Comments, error)
 	}
 
 	Followers interface{

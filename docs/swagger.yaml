@@ -16,6 +16,19 @@ definitions:
     - content
     - title
     type: object
+  main.CreateUserTokenPayload:
+    properties:
+      email:
+        maxLength: 255
+        type: string
+      password:
+        maxLength: 72
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    type: object
   main.RegisterUserPayload:
     properties:
       email:
@@ -150,13 +163,44 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is a  server for social One.
+  description: This is a server for social One.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
   title: SocialOne API
 paths:
+  /authentication/token:
+    post:
+      consumes:
+      - application/json
+      description: Creates a token for a user
+      parameters:
+      - description: User credentials
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.CreateUserTokenPayload'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Creates a token
+      tags:
+      - authentication
   /authentication/user:
     post:
       consumes:
@@ -185,63 +229,6 @@ paths:
       summary: Registers a user
       tags:
       - authentication
-  /feed:
-    get:
-      consumes:
-      - application/json
-      description: Fetches the user feed with optional filters for pagination, sorting,
-        and other criteria
-      parameters:
-      - description: Since
-        in: query
-        name: since
-        type: string
-      - description: Until
-        in: query
-        name: until
-        type: string
-      - description: Limit
-        in: query
-        name: limit
-        type: integer
-      - description: Offset
-        in: query
-        name: offset
-        type: integer
-      - description: Sort
-        in: query
-        name: sort
-        type: string
-      - description: Tags
-        in: query
-        name: tags
-        type: string
-      - description: Search
-        in: query
-        name: search
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Successfully fetched the user feed
-          schema:
-            items:
-              items:
-                $ref: '#/definitions/store.PostwithMetaData'
-              type: array
-            type: array
-        "400":
-          description: Invalid request data
-          schema: {}
-        "500":
-          description: Internal server error
-          schema: {}
-      security:
-      - ApiKeyAuth: []
-      summary: Fetches the user feed
-      tags:
-      - feed
   /healthcheck:
     get:
       consumes:
@@ -288,6 +275,8 @@ paths:
         "500":
           description: Internal server error
           schema: {}
+      security:
+      - ApiKeyAuth: []
       summary: Create a new post
       tags:
       - posts
@@ -318,6 +307,8 @@ paths:
         "500":
           description: Internal server error
           schema: {}
+      security:
+      - ApiKeyAuth: []
       summary: Delete a post by ID
       tags:
       - posts
@@ -347,6 +338,8 @@ paths:
         "500":
           description: Internal server error
           schema: {}
+      security:
+      - ApiKeyAuth: []
       summary: Get a post by ID
       tags:
       - posts
@@ -382,6 +375,8 @@ paths:
         "500":
           description: Internal server error
           schema: {}
+      security:
+      - ApiKeyAuth: []
       summary: Update an existing post
       tags:
       - posts
@@ -501,6 +496,63 @@ paths:
       summary: Activates/Register a user
       tags:
       - users
+  /users/feed:
+    get:
+      consumes:
+      - application/json
+      description: Fetches the user feed with optional filters for pagination, sorting,
+        and other criteria
+      parameters:
+      - description: Since
+        in: query
+        name: since
+        type: string
+      - description: Until
+        in: query
+        name: until
+        type: string
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      - description: Offset
+        in: query
+        name: offset
+        type: integer
+      - description: Sort
+        in: query
+        name: sort
+        type: string
+      - description: Tags
+        in: query
+        name: tags
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully fetched the user feed
+          schema:
+            items:
+              items:
+                $ref: '#/definitions/store.PostwithMetaData'
+              type: array
+            type: array
+        "400":
+          description: Invalid request data
+          schema: {}
+        "500":
+          description: Internal server error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Fetches the user feed
+      tags:
+      - feed
 securityDefinitions:
   ApiKeyAuth:
     in: header

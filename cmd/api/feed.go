@@ -22,7 +22,7 @@ import (
 // @Failure      400     {object} error "Invalid request data"
 // @Failure      500     {object} error "Internal server error"
 // @Security     ApiKeyAuth
-// @Router       /feed [get]
+// @Router       /users/feed [get]
 func (app *application) getUserFeedHandler(w http.ResponseWriter, r *http.
 	Request){
 

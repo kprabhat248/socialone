@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/sha256"
 	"database/sql"
+	"fmt"
+
 	"encoding/hex"
 	"errors"
 	"time"
@@ -38,6 +40,19 @@ func (p *password) Set(text string) error{
 	return nil
 
 }
+func (p *password) Scan(value interface{}) error {
+	if value == nil {
+		return nil
+	}
+	str, ok := value.(string)
+	if !ok {
+		return fmt.Errorf("expected string but got %T", value)
+	}
+	p.hash = []byte(str)  // Store the hash from the DB
+	return nil
+}
+
+
 
 type UserStore struct {
 	db *sql.DB
@@ -77,7 +92,7 @@ func(s *UserStore) GetByID(ctx context.Context, userID int64)(*User, error){
 	query:= `
 		SELECT id, username, email, password, created_at
 		FROM users
-		WHERe id = $1
+		WHERE id = $1 and is_active = true
 
 	`
 
@@ -91,7 +106,7 @@ func(s *UserStore) GetByID(ctx context.Context, userID int64)(*User, error){
 
 	).Scan(&user.ID,&user.Username,
 		&user.Email,
-		&user.Password, &user.CreatedAt,)
+		&user.Password.hash, &user.CreatedAt,)
 	if err!=nil{
 		switch err{
 		case sql.ErrNoRows:
@@ -208,4 +223,28 @@ func (s *UserStore) deleteUserInvitations(ctx context.Context, tx *sql.Tx, userI
 	return err
 	}
 	return nil
+}
+
+func (s *UserStore) GetByEmail(ctx context. Context, email string) (*User, error){
+	query:= `SELECT id, username, email, password, created_at, is_active FROM users WHERE email = $1`
+	ctx,cancel:= context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+	user:= &User{}
+	err:= s.db.QueryRowContext(ctx, query, email).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.Password,
+		&user.CreatedAt,
+		&user.IsActive,
+	)
+	if err!=nil{
+		switch err{
+		case sql.ErrNoRows:
+			return nil, ErrNotFound
+		default:
+			return nil,err
+		}
+	}
+	return user,nil
 }

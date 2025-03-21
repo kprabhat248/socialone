@@ -32,6 +32,7 @@ type CreatePostPayload struct {
 // @Success      201      {object}  store.Post  "Post created successfully"
 // @Failure      400      {object}  error  "Bad request"
 // @Failure      500      {object}  error  "Internal server error"
+// @Security	 ApiKeyAuth
 // @Router       /posts [post]
 func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request){
 
@@ -45,13 +46,13 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-
+	user:= getUserFromContext(r)
 
 	post:= &store.Post{
 		Title:  payload.Title,
 		Content: payload.Content,
 		Tags: payload.Tags,
-		UserId: 1,
+		UserId: user.ID,
 	}
 
 
@@ -80,6 +81,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 // @Failure      400     {object}  error  "Invalid post ID"
 // @Failure      404     {object}  error  "Post not found"
 // @Failure      500     {object}  error  "Internal server error"
+// @Security	 ApiKeyAuth
 // @Router       /posts/{ID} [get]
 func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request){
 	idParam:= chi.URLParam(r, "postID")
@@ -126,6 +128,7 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request){
 // @Failure      400     {object}  error  "Invalid post ID"
 // @Failure      404     {object}  error  "Post not found"
 // @Failure      500     {object}  error  "Internal server error"
+// @Security	 ApiKeyAuth
 // @Router       /posts/{ID} [delete]
 func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request){
 	idParam:= chi.URLParam(r, "postID")
@@ -170,6 +173,7 @@ type UpdatePostPayload struct {
 // @Failure      400     {object}  error  "Bad request"
 // @Failure      404     {object}  error  "Post not found"
 // @Failure      500     {object}  error  "Internal server error"
+// @Security	 ApiKeyAuth
 // @Router       /posts/{ID} [put]
 func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request){
 	post:= getPostFromContext(r.Context())
