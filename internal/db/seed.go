@@ -147,16 +147,14 @@ func generateUsers(num int) [] *store.User{
 		users[i]= &store.User{
 			Username: usernames[i%len(usernames)] + fmt.Sprintf("%d", i),
 			Email: usernames[i%len(usernames)] + fmt.Sprintf("%d", i) + "@example.com",
-            RoleID: store.Role{
+            Role: &store.Role{
                 Name: "user",
             },
+
         }
 
-		}
-
-
-
 	}
+
 	return users
 }
 func generatePost(nums int, users []*store.User) []*store.Post{
