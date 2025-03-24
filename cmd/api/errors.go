@@ -10,7 +10,10 @@ func (app *application) internalServerError(w http.ResponseWriter, r *http.Reque
 	WriteJsonError(w, http.StatusInternalServerError, "The server encountered an internal error")
 }
 
-
+func (app *application) forbiddenResponse(w http.ResponseWriter, r *http.Request, ){
+	app.logger.Warnw("Forbidden Response: %s path: %s error: %v", r.Method, r.URL.Path)
+	WriteJsonError(w, http.StatusForbidden, "Forbidden")
+}
 func (app *application) badRequestResponse(w http.ResponseWriter, r *http.Request, err error){
 	log.Printf("Bad Request Error: %s path: %s error: %v", r.Method, r.URL.Path, err)
 	WriteJsonError(w, http.StatusBadRequest,err.Error())

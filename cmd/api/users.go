@@ -105,7 +105,7 @@ func (app *application)followUserHandler(w http.ResponseWriter, r *http.Request)
 // @Failure      400  {object} error "Bad request"
 // @Security     ApiKeyAuth
 // @Router       /users/{userID}/unfollow [put]
-func (app *application)unfollowUserHandler(w http.ResponseWriter, r *http.Request){
+func (app *application) unfollowUserHandler(w http.ResponseWriter, r *http.Request){
 	followerUser:= getUserFromContext(r)
 	unfollowedID,err:= strconv.ParseInt(chi.URLParam(r,"userID"),10,64)
 	if err!=nil{
@@ -157,16 +157,16 @@ func (app *application)activateUserHandler(w http.ResponseWriter, r *http.Reques
 	// Your handler logic here
 }
 
-func (app *application)userContextMiddleware(next http.Handler) http.Handler{
+func (app *application) userContextMiddleware(next http.Handler) http.Handler{
 	return http.HandlerFunc(func( w http.ResponseWriter, r *http.Request ) {
 
-		UserID,err:= strconv.ParseInt(chi.URLParam(r,"userID"),10,64)
+		userID,err:= strconv.ParseInt(chi.URLParam(r,"userID"),10,64)
 	if err!=nil{
 		app.badRequestResponse(w,r, err)
 
 	}
 	ctx:= r.Context()
-	user,err:= app.store.Users .GetByID(ctx,UserID)
+	user,err:= app.store.Users.GetByID(ctx, userID)
 	if err!=nil{
 		 switch err{
 

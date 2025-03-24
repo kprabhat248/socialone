@@ -9,18 +9,18 @@ import (
 	"strconv"
 
 	"github.com/go-chi/chi"
-
 )
-type postkey string
-const postCtx postkey= "post"
 
+type postkey string
+
+const postCtx postkey = "post"
 
 type CreatePostPayload struct {
-	Title string `json:"title" validate:"required,max=100"`
-	Content string `json:"content" validate:"required,max=500"`
-	Tags 	[]string `json:"tags"`
-
+	Title   string   `json:"title" validate:"required,max=100"`
+	Content string   `json:"content" validate:"required,max=500"`
+	Tags    []string `json:"tags"`
 }
+
 // createPostHandler godoc
 //
 // @Summary      Create a new post
@@ -34,41 +34,40 @@ type CreatePostPayload struct {
 // @Failure      500      {object}  error  "Internal server error"
 // @Security	 ApiKeyAuth
 // @Router       /posts [post]
-func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request){
+func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	var payload CreatePostPayload
-	if err:= ReadJson(w, r, &payload); err!=nil{
+	if err := ReadJson(w, r, &payload); err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
-	if err:= Validate.Struct(payload); err!=nil{
+	if err := Validate.Struct(payload); err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
 
-	user:= getUserFromContext(r)
+	user := getUserFromContext(r)
 
-	post:= &store.Post{
-		Title:  payload.Title,
+	post := &store.Post{
+		Title:   payload.Title,
 		Content: payload.Content,
-		Tags: payload.Tags,
-		UserId: user.ID,
+		Tags:    payload.Tags,
+		UserId:  user.ID,
 	}
 
+	ctx := r.Context()
 
-
-	ctx:= r.Context()
-
-	if err:= app.store.Posts.Create(ctx, post); err!=nil{
+	if err := app.store.Posts.Create(ctx, post); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
 
-	if err:= app.jsonResponse(w, http.StatusCreated, post); err!=nil{
+	if err := app.jsonResponse(w, http.StatusCreated, post); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
 }
+
 // getPostHandler godoc
 //
 // @Summary      Get a post by ID
@@ -82,18 +81,18 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 // @Failure      404     {object}  error  "Post not found"
 // @Failure      500     {object}  error  "Internal server error"
 // @Security	 ApiKeyAuth
-// @Router       /posts/{ID} [get]
-func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request){
-	idParam:= chi.URLParam(r, "postID")
-	id, err:= strconv.ParseInt(idParam,10,64)
-	if err!=nil{
+// @Router       /posts/{postID} [get]
+func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "postID")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
 
-	ctx:= r.Context()
-	post,err:= app.store.Posts.GetByID(ctx, id)
-	if err!=nil{
+	ctx := r.Context()
+	post, err := app.store.Posts.GetByID(ctx, id)
+	if err != nil {
 		switch {
 		case errors.Is(err, store.ErrNotFound):
 			app.NotFoundResponse(w, r, err)
@@ -103,19 +102,19 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-
-	comments, err:= app.store.Comments.GetByPostID(ctx, post.ID)
-	if err!=nil{
+	comments, err := app.store.Comments.GetByPostID(ctx, post.ID)
+	if err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
-	post.Comments= *comments
+	post.Comments = *comments
 
-	if err:= app.jsonResponse(w, http.StatusOK, post); err!=nil{
+	if err := app.jsonResponse(w, http.StatusOK, post); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
 }
+
 // deletePostHandler godoc
 //
 // @Summary      Delete a post by ID
@@ -129,24 +128,23 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request){
 // @Failure      404     {object}  error  "Post not found"
 // @Failure      500     {object}  error  "Internal server error"
 // @Security	 ApiKeyAuth
-// @Router       /posts/{ID} [delete]
-func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request){
-	idParam:= chi.URLParam(r, "postID")
-	id, err:= strconv.ParseInt(idParam, 10, 64)
-	if err!=nil{
+// @Router       /posts/{postID} [delete]
+func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "postID")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
 
-	ctx:= r.Context()
-	if err:= app.store.Posts.Delete(ctx, id); err!=nil{
+	ctx := r.Context()
+	if err := app.store.Posts.Delete(ctx, id); err != nil {
 		switch {
-			case errors.Is(err, store.ErrNotFound):
-				app.NotFoundResponse(w, r, err)
-			default:
-				app.internalServerError(w, r, err)
+		case errors.Is(err, store.ErrNotFound):
+			app.NotFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
 		}
-
 
 		return
 
@@ -156,10 +154,11 @@ func (app *application) deletePostHandler(w http.ResponseWriter, r *http.Request
 }
 
 type UpdatePostPayload struct {
-	Title string `json:"title" validate:"omitempty,max=100"`
-	Content string `json:"content" validate:"omitempty,max=500"`
-	Tags []string `json:"tags"`
+	Title   string   `json:"title" validate:"omitempty,max=100"`
+	Content string   `json:"content" validate:"omitempty,max=500"`
+	Tags    []string `json:"tags"`
 }
+
 // updatePostHandler godoc
 //
 // @Summary      Update an existing post
@@ -174,16 +173,32 @@ type UpdatePostPayload struct {
 // @Failure      404     {object}  error  "Post not found"
 // @Failure      500     {object}  error  "Internal server error"
 // @Security	 ApiKeyAuth
-// @Router       /posts/{ID} [put]
-func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request){
-	post:= getPostFromContext(r.Context())
+// @Router       /posts/{postID} [patch]
+func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "postID")
+	id, err := strconv.ParseInt(idParam, 10, 64)
+	if err != nil {
+		app.badRequestResponse(w, r, errors.New("invalid post ID"))
+		return
+	}
+
+	post, err := app.store.Posts.GetByID(r.Context(), id)
+	if err != nil {
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.NotFoundResponse(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
 
 	var payload UpdatePostPayload
-	if err:= ReadJson(w, r, &payload); err!=nil{
+	if err := ReadJson(w, r, &payload); err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
-	if err:= Validate.Struct(payload); err!=nil{
+	if err := Validate.Struct(payload); err != nil {
 		app.badRequestResponse(w, r, err)
 		return
 	}
@@ -193,34 +208,32 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 	if payload.Title != "" {
 		post.Title = payload.Title
 	}
-	if payload.Tags!=nil{
-		post.Tags= payload.Tags
+	if payload.Tags != nil {
+		post.Tags = payload.Tags
 	}
 
-
-	if err:= app.store.Posts.Update(r.Context(), post); err!=nil{
+	if err := app.store.Posts.Update(r.Context(), post); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
 
-	if err:= WriteJson(w, http.StatusOK, post); err!=nil{
+	if err := WriteJson(w, http.StatusOK, post); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
-
 
 }
 
-func (app *application) postsContextMiddleware(next http.Handler) http.Handler{
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
-		idParam:= chi.URLParam(r, "postID")
-		id, err:= strconv.ParseInt(idParam, 10, 64)
-		if err!=nil{
+func (app *application) postsContextMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		idParam := chi.URLParam(r, "postID") // Ensure the parameter name matches the route definition
+		id, err := strconv.ParseInt(idParam, 10, 64)
+		if err != nil {
 			app.internalServerError(w, r, err)
 			return
 		}
-		post, err:= app.store.Posts.GetByID(r.Context(), id)
-		if err!=nil{
+		post, err := app.store.Posts.GetByID(r.Context(), id)
+		if err != nil {
 			switch {
 			case errors.Is(err, store.ErrNotFound):
 				app.NotFoundResponse(w, r, err)
@@ -229,12 +242,11 @@ func (app *application) postsContextMiddleware(next http.Handler) http.Handler{
 			}
 			return
 		}
-		ctx:= context.WithValue(r.Context(), postCtx, post)
+		ctx := context.WithValue(r.Context(), postCtx, post)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
-func getPostFromContext(ctx context.Context) *store.Post{
-	post, _:= ctx.Value(postCtx).(*store.Post)
+func getPostFromContext(ctx context.Context) *store.Post {
+	post, _ := ctx.Value(postCtx).(*store.Post)
 	return post
 }
-
