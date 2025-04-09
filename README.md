@@ -39,7 +39,8 @@ To run this project locally, ensure that you have the following installed:
 
 ### Setting up the Backend
 <img width="1710" alt="Screenshot 2025-04-09 at 5 03 20 PM" src="https://github.com/user-attachments/assets/bf861460-8e2f-423d-8218-2cc53da3bc2c" />
-<img width="1710" alt="Screenshot 2025-04-09 at 5 04 12 PM" src="https://github.com/user-attachments/assets/9d01c69e-def7-4422-82e4-495a185f88b9" />
+![image](https://github.com/user-attachments/assets/8097f3b5-5814-40b0-ae7f-72032b1fd32d)
+
 
 1. Clone the repository:
    ```bash
