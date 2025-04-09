@@ -1,6 +1,8 @@
 # SocialOne
 
 SocialOne is a Backend web application  built with a Go (Golang) backend and a React frontend. The application provides CRUD operations, a PostgreSQL database, JWT authentication, and bearer token authorization for secure access to various endpoints.
+<img width="1369" alt="Screenshot 2025-04-09 at 5 01 15 PM" src="https://github.com/user-attachments/assets/6fbfeb03-f3b1-45f4-8263-81db02af6557" />
+
 
 ## Features
 - **Golang Backend**: RESTful API built with Go to handle all CRUD operations.
@@ -9,6 +11,7 @@ SocialOne is a Backend web application  built with a Go (Golang) backend and a R
 - **JWT Authentication**: Secure authentication mechanism using JWT (JSON Web Tokens).
 - **Bearer Token Authorization**: Protects routes via bearer token authentication.
 - **React Frontend**: User interface developed with React, interacting with the backend via API calls.
+<img width="1710" alt="Screenshot 2025-04-09 at 5 04 39 PM" src="https://github.com/user-attachments/assets/770a3bcb-e00d-48fc-8171-52c436a0114e" />
 
 ## Technologies Used
 - **Golang** (Backend)
@@ -18,9 +21,13 @@ SocialOne is a Backend web application  built with a Go (Golang) backend and a R
 - **JWT** (Authentication)
 - **Microservices Architecture**
 - **Bearer Token** (Authorization)
+<img width="1710" alt="Screenshot 2025-04-09 at 5 05 51 PM" src="https://github.com/user-attachments/assets/724a59f3-66d6-4b58-8e2a-d7271a1cc5d9" />
+<img width="1710" alt="Screenshot 2025-04-09 at 5 06 21 PM" src="https://github.com/user-attachments/assets/1cdc7fca-c0a1-4a26-8e40-758a123f8d28" />
 
 
 ## Getting Started
+<img width="1710" alt="Screenshot 2025-04-09 at 5 03 14 PM" src="https://github.com/user-attachments/assets/534376b7-707b-40f2-b6ad-ce5b94137f0c" />
+
 
 ### Prerequisites
 To run this project locally, ensure that you have the following installed:
@@ -29,7 +36,10 @@ To run this project locally, ensure that you have the following installed:
 - **Docker** (for containerization)
 - **PostgreSQL** (database)
 
+
 ### Setting up the Backend
+<img width="1710" alt="Screenshot 2025-04-09 at 5 03 20 PM" src="https://github.com/user-attachments/assets/bf861460-8e2f-423d-8218-2cc53da3bc2c" />
+<img width="1710" alt="Screenshot 2025-04-09 at 5 04 12 PM" src="https://github.com/user-attachments/assets/9d01c69e-def7-4422-82e4-495a185f88b9" />
 
 1. Clone the repository:
    ```bash
