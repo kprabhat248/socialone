@@ -26,7 +26,9 @@ SocialOne is a Backend web application  built with a Go (Golang) backend and a R
 
 
 ## Getting Started
-<img width="1710" alt="Screenshot 2025-04-09 at 5 03 14 PM" src="https://github.com/user-attachments/assets/534376b7-707b-40f2-b6ad-ce5b94137f0c" />
+
+<img width="1706" alt="Screenshot 2025-04-09 at 5 03 14 PM" src="https://github.com/user-attachments/assets/806025ea-c087-485e-b4e9-e8ce26129d47" />
+
 
 
 ### Prerequisites
@@ -73,7 +75,7 @@ A React frontend service.
 A PostgreSQL service.
 The application will be available at http://localhost:3000 (frontend) and the backend API at http://localhost:8080.
 
-###Troubleshooting
+### Troubleshooting
 
 Ensure that Docker is running before starting the containers.
 Verify that the PostgreSQL service is up and running. If there are connection issues, check the database credentials in the .env file.
