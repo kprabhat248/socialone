@@ -38,8 +38,10 @@ To run this project locally, ensure that you have the following installed:
 
 
 ### Setting up the Backend
-<img width="1710" alt="Screenshot 2025-04-09 at 5 03 20 PM" src="https://github.com/user-attachments/assets/bf861460-8e2f-423d-8218-2cc53da3bc2c" />
-![image](https://github.com/user-attachments/assets/8097f3b5-5814-40b0-ae7f-72032b1fd32d)
+<img width="1699" alt="Screenshot 2025-04-09 at 5 03 20 PM" src="https://github.com/user-attachments/assets/7a4bf300-c811-458a-9058-9207fd881363" />
+
+<img width="1499" alt="Screenshot 2025-04-09 at 5 04 12 PM" src="https://github.com/user-attachments/assets/8a5b59e6-6b00-4449-8afc-d8283d9cc368" />
+
 
 
 1. Clone the repository:
